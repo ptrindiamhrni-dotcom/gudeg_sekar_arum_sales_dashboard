@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -29,7 +28,6 @@ except (OSError, pd.errors.ParserError, UnicodeDecodeError) as e:
     st.error(f"File CSV gagal dibaca: {e}")
     st.stop()
 
-# Rapikan nama kolom untuk menghindari spasi tidak sengaja
 df.columns = df.columns.astype(str).str.strip()
 
 required = [
@@ -53,7 +51,6 @@ if missing:
     st.write("Kolom yang tersedia:", df.columns.tolist())
     st.stop()
 
-# Konversi tanggal dan angka dengan penanganan nilai tidak valid
 df["Tanggal"] = pd.to_datetime(df["Tanggal"], errors="coerce")
 
 numeric_cols = [
@@ -68,7 +65,7 @@ numeric_cols = [
 for col in numeric_cols:
     df[col] = pd.to_numeric(df[col], errors="coerce")
 
-# Baris tanpa tanggal tidak dapat dipakai untuk analisis waktu
+
 invalid_dates = int(df["Tanggal"].isna().sum())
 df = df.dropna(subset=["Tanggal"]).copy()
 
@@ -85,19 +82,15 @@ for col in [
 ]:
     df[col] = df[col].fillna(0)
 
-# Buat kolom Bulan jika tidak tersedia nilainya
 df["Bulan"] = df["Bulan"].fillna(
     df["Tanggal"].dt.strftime("%Y-%m")
 ).astype(str)
 
-# Abaikan nilai kategori kosong pada pilihan filter
 for col in ["Outlet", "Kanal_Penjualan", "Jenis_Hari"]:
     df[col] = df[col].fillna("Tidak diketahui").astype(str).str.strip()
     df[col] = df[col].replace("", "Tidak diketahui")
 
-# =========================
-# FILTER DASHBOARD
-# =========================
+
 a, b, c = st.columns(3)
 
 outlet_options = sorted(df["Outlet"].unique().tolist())
@@ -230,9 +223,7 @@ with right:
 
     st.plotly_chart(fig, use_container_width=True)
 
-# =========================
-# GRAFIK 3: PANGSA OMZET
-# =========================
+
 left, right = st.columns(2)
 
 with left:
@@ -253,9 +244,7 @@ with left:
     else:
         st.info("Tidak ada omzet positif untuk ditampilkan.")
 
-# =========================
-# GRAFIK 4: DISTRIBUSI ONLINE
-# =========================
+
 with right:
     online = d[
         d["Kanal_Penjualan"].str.strip().str.casefold()
@@ -288,9 +277,7 @@ with right:
             "pada filter yang dipilih."
         )
 
-# =========================
-# EVALUASI DISKON
-# =========================
+
 st.subheader("Evaluasi diskon — deskriptif, bukan ROI")
 
 if not online.empty:
@@ -324,14 +311,11 @@ st.warning(
     "disimpulkan."
 )
 
-# =========================
-# TABEL DATA HASIL FILTER
-# =========================
+
 with st.expander("Lihat data sesuai filter"):
     st.dataframe(d, use_container_width=True)
 
 st.caption(
-    "Sumber: Data Simulasi Penjualan Gudeg Sekar Arum 2025, "
-    "diolah kelompok."
+    "Sumber: Data Simulasi Penjualan Gudeg Sekar Arum 2025"
+    
 )
-
